@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Foundation\Auth\AuthenticatesAndRegistersUsers;
 use Illuminate\Http\Request;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -72,11 +72,11 @@ class AuthController extends Controller
         ]);
     }
 
-    public function postLogin(Request $request)
+    public function login(Request $request)
     {
         $username = $request->input("username");
         $password = $request->input("password");
-        if (auth()->attempt(['name' => $username, 'password' => $password])) {
+        if (Auth::attempt(['name' => $username, 'password' => $password])) {
             // Authentication passed...
             return redirect('/home');
         } else {

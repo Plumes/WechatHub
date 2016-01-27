@@ -11,6 +11,7 @@
     <div class="row">
         <div class="col-md-4 col-md-offset-4">
             <form action="" method="post">
+                {{ csrf_field() }}
                 <div class="form-group">
                     <label for="username">Email address</label>
                     <input type="text" class="form-control" id="username" name="username" placeholder="用户名">
