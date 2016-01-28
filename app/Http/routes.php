@@ -25,6 +25,9 @@
 
 Route::group(['middleware' => ['web']], function () {
     Route::auth();
+    Route::get('/create', 'DashboardController@getCreate');
+    Route::post('/create', 'DashboardController@postCreate');
+    Route::get('/{mp_id}/menu', 'DashboardController@getMenu');
     Route::get('/', 'DashboardController@index');
 
 });
