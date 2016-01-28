@@ -13,20 +13,12 @@ class MediaPlatform extends Model
     ];
     protected $table = 'media_platform';
     private $mp;
-    public function __construct(array $attributes=[],$mp_id=false)
-    {
-        parent::__construct($attributes);
-        if($mp_id) {
-            $this->mp = $this->find($mp_id);
-            $this->refreshToken();
-        }
-    }
 
     private function refreshToken() {
-        $token_update_time = $this->mp['token_updated'];
+        $token_update_time = $this['token_updated'];
         if((time() - $token_update_time) > 3600) {
             //如果 token 距上次更新超过一小时则再次更新
-            $api = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=".$this->mp['appid']."&secret=".$this->mp['appsecret'];
+            $api = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=".$this['appid']."&secret=".$this['appsecret'];
             $result = httpGet($api);
             $result = json_decode($result,true);
             //$this->mp['access_token'] = $result['access_token'];
@@ -37,19 +29,52 @@ class MediaPlatform extends Model
     }
 
     public static function createMP($mp) {
-        $result = MediaPlatform::create($mp);
-        $mp_id = $result['id'];
-        return $mp_id;
-    }
+    $result = MediaPlatform::create($mp);
+    $mp_id = $result['id'];
+    return $mp_id;
+}
 
     public function getMenu() {
         return $this->getMenuFromRemote();
     }
 
     public function getMenuFromRemote() {
-        $api = "https://api.weixin.qq.com/cgi-bin/menu/get?access_token=".$this->mp['access_token'];
+        $this->refreshToken();
+        $api = "https://api.weixin.qq.com/cgi-bin/menu/get?access_token=".$this['access_token'];
         $result = httpGet($api);
         $result = json_decode($result,true);
+        $this->saveMenu($result['menu']['button']);
         return $result;
+
+    }
+
+    public function saveMenu($button_list) {
+        Menu::where("mp_id",$this['id'])->delete();
+        foreach($button_list as $k=>$button) {
+            $new_btn = array(
+                'type'=>isset($button['type'])?$button['type']:"",
+                'name'=>$button['name'],
+                'key'=>isset($button['key'])?$button['key']:"",
+                'url'=>isset($button['url'])?$button['url']:"",
+                'order'=>$k,
+                'parent'=>0,
+                'mp_id'=>$this['id']
+            );
+            $parent_btn = Menu::create($new_btn);
+            if(count($button['sub_button'])>0) {
+                foreach($button['sub_button'] as $i=>$child_button) {
+                    $new_btn = array(
+                        'type'=>isset($child_button['type'])?$child_button['type']:"",
+                        'name'=>$child_button['name'],
+                        'key'=>isset($child_button['key'])?$child_button['key']:"",
+                        'url'=>isset($child_button['url'])?$child_button['url']:"",
+                        'order'=>$i,
+                        'parent'=>$parent_btn['id'],
+                        'mp_id'=>$this['id']
+                    );
+                    Menu::create($new_btn);
+                }
+            }
+        }
     }
 }

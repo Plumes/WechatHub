@@ -18,6 +18,7 @@ class DashboardController extends Controller
     }
     //
     public function index() {
+        $mp = new MediaPlatform(['id'=>1]);
         return view('welcome');
     }
 
@@ -30,13 +31,11 @@ class DashboardController extends Controller
         $mp['appid'] = $request->input("appid");
         $mp['appsecret'] = $request->input("appsecret");
         $mp_id = MediaPlatform::createMP($mp);
-        $mp = new MediaPlatform([],$mp_id);
-        var_dump($mp_id);
     }
 
     public function getMenu($mp_id) {
-        $mp = new MediaPlatform([],$mp_id);
+        $mp = MediaPlatform::find($mp_id);
         $menu_list = $mp->getMenu();
-        dd($menu_list);
+        //dd($menu_list);
     }
 }
