@@ -12,7 +12,6 @@ class MediaPlatform extends Model
         'appname', 'appid', 'appsecret','access_token',
     ];
     protected $table = 'media_platform';
-    private $mp;
 
     private function refreshToken() {
         $token_update_time = $this['token_updated'];
@@ -29,13 +28,23 @@ class MediaPlatform extends Model
     }
 
     public static function createMP($mp) {
-    $result = MediaPlatform::create($mp);
-    $mp_id = $result['id'];
-    return $mp_id;
-}
+        $result = MediaPlatform::create($mp);
+        $mp_id = $result['id'];
+        return $mp_id;
+    }
 
     public function getMenu() {
-        return $this->getMenuFromRemote();
+        $button_list = Menu::where("mp_id",$this['id'])
+                            ->where("parent",0)
+                            ->orderBy('order', 'asc')
+                            ->get();
+        foreach($button_list as $k=>$button) {
+            $button_list[$k]['sub_button'] = Menu::where("mp_id",$this['id'])
+                                                ->where("parent",$button['id'])
+                                                ->orderBy('order', 'asc')
+                                                ->get();
+        }
+        return $button_list;
     }
 
     public function getMenuFromRemote() {
@@ -45,6 +54,18 @@ class MediaPlatform extends Model
         $result = json_decode($result,true);
         $this->saveMenu($result['menu']['button']);
         return $result;
+
+    }
+
+    public function pushMenuToRemote($button_list) {
+        $this->refreshToken();
+        //需要先执行删除操作，把现有菜单全部删除
+        $api = config("wechat_api.menu.delete");
+        $api .= $this['access_token'];
+        $result = httpGet($api);
+        $api = config("wechat_api.menu.create");
+        $result = httpPost($api,json_encode($button_list));
+        $result = json_decode($result,true);
 
     }
 

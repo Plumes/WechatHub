@@ -35,7 +35,7 @@ class DashboardController extends Controller
 
     public function getMenu($mp_id) {
         $mp = MediaPlatform::find($mp_id);
-        $menu_list = $mp->getMenu();
-        //dd($menu_list);
+        $button_list = $mp->getMenu();
+        return view("menu",compact("mp","button_list"));
     }
 }
