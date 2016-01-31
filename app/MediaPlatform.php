@@ -64,8 +64,28 @@ class MediaPlatform extends Model
         $api .= $this['access_token'];
         $result = httpGet($api);
         $api = config("wechat_api.menu.create");
-        $result = httpPost($api,json_encode($button_list));
-        $result = json_decode($result,true);
+        $api .= $this['access_token'];
+
+        foreach($button_list as $k=>$button) {
+            $button_list[$k]['name'] = urlencode($button_list[$k]['name']);
+            $button_list[$k]['key'] = urlencode($button_list[$k]['key']);
+            $button_list[$k]['url'] = urlencode($button_list[$k]['url']);
+            $sub_btn_list = [];
+            if(count($button['sub_button'])>0) {
+                foreach($button['sub_button'] as $i=>$child_button) {
+                    $button_list[$k]['sub_button'][$i]['name'] = urlencode($button_list[$k]['sub_button'][$i]['name']);
+                    $button_list[$k]['sub_button'][$i]['key'] = urlencode($button_list[$k]['sub_button'][$i]['key']);
+                    $button_list[$k]['sub_button'][$i]['url'] = urlencode($button_list[$k]['sub_button'][$i]['url']);
+                    $sub_btn_list[] = $button_list[$k]['sub_button'][$i];
+                }
+            }
+            unset($button_list[$k]['sub_button']);
+            $button_list[$k]['sub_button'] = $sub_btn_list;
+        }
+
+        //$result = httpPost($api,json_encode(array("button"=>$button_list)));
+        //$result = json_decode($result,true);
+        return array("button"=>$button_list);
 
     }
 

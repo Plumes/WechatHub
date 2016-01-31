@@ -28,6 +28,7 @@ Route::group(['middleware' => ['web']], function () {
     Route::get('/create', 'DashboardController@getCreate');
     Route::post('/create', 'DashboardController@postCreate');
     Route::get('/{mp_id}/menu', 'DashboardController@getMenu');
+    Route::post('/api/{mp_id}/menu/save', 'ApiController@saveMenu');
     Route::get('/api/{mp_id}/menu/pull', 'ApiController@pullMenu');
     Route::get('/', 'DashboardController@index');
 

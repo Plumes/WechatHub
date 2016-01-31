@@ -22,4 +22,12 @@ class ApiController extends Controller
         $button_list = $mp->getMenuFromRemote();
         echo (json_encode(['code'=>0,"button_list"=>$button_list]));
     }
+
+    public function saveMenu($mp_id, Request $request) {
+        $mp = MediaPlatform::find($mp_id);
+        $post_data = $request->all();
+        $mp->saveMenu($post_data['data']);
+        $result = $mp->pushMenuToRemote($post_data['data']);
+        echo(json_encode($result));
+    }
 }

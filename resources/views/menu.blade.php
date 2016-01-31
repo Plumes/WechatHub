@@ -37,12 +37,24 @@
                 <label for="btn-type">按钮类型</label>
                 <label class="radio-inline">
                     <input type="radio" name="btn-type"  value="view"> 网页链接
+
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" name="btn-type"  value="click"> 点击事件
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" name="btn-type"  value="group"> 按钮组
                 </label>
             </div>
 
             <div class="form-group">
                 <label for="btn-url">按钮链接</label>
-                <input type="text" class="form-control" id="btn-url" value="">
+                <input type="text" class="form-control" id="btn-url" value="" disabled>
+            </div>
+
+            <div class="form-group">
+                <label for="btn-url">按钮消息</label>
+                <input type="text" class="form-control" id="btn-key" value="" disabled>
             </div>
 
             <div class="form-group">
@@ -89,8 +101,11 @@
         $("#confirm-btn").data( "btnId", $(this).data("btnId") );
         $("#btn-url").val($(this).data("url"));
         $("#btn-order").val($(this).data("order"));
+        $("#btn-key").val($(this).data("key"));
         if($(this).data("type")!="") {
-            $("input[name=btn-type][value="+$(this).data("type")+"]").attr("checked",true);
+            $("input[name=btn-type][value="+$(this).data("type")+"]").click();
+        } else {
+            $("input[name=btn-type][value='group']").click();
         }
         $(".button_edit_area").show();
         if($(this).parent().find(".v-bar-wrap").length>0) {
@@ -103,6 +118,16 @@
         $(this).parent().addClass("current");
 
     });
+    $("input[name='btn-type']").change(function(){
+        var type_list = {"view":"url","click":"key"};
+        for(var i in type_list) {
+            $("#btn-"+type_list[i]).attr("disabled",true);
+        }
+        var checked = $("input[name='btn-type']:checked").val();
+        if(checked in type_list) {
+            $("#btn-"+type_list[checked]).attr("disabled",false);
+        }
+    })
     $("#del-btn").click(function() {
         var btn_id = $(this).data("btnId");
         $("#btn-"+btn_id).remove();
@@ -125,6 +150,7 @@
         }
         $(btn).data("url",$("#btn-url").val());
         $(btn).data("order",$("#btn-order").val());
+        $(btn).data("key",$("#btn-key").val());
         return true;
     });
     $(".add-x-btn").click(function() {
@@ -161,6 +187,62 @@
         if(v_bar_btn_num>=5) {
             $(this).parent().hide();
         }
+
+    });
+    $("#save-btn").click(function() {
+        var x_btn_list = $(".horizontal-bar>.button-wrap").toArray();
+        var post_data = {};
+        for (var i in x_btn_list) {
+            var btn_list = $(x_btn_list[i]).find(".button").toArray();
+            if(btn_list.length<1) {
+                continue;
+            }
+            var btn = btn_list[0];
+            var btn_name = $(btn).text();
+            if(btn_name.length<1) {
+                continue;
+            }
+            var btn_data = {};
+            btn_data['name'] = btn_name;
+            btn_data['type'] = $(btn).data("type");
+            btn_data['key'] = $(btn).data("key");
+            btn_data['url'] = $(btn).data("url");
+            btn_data['order'] = $(btn).data("order");
+            btn_data['sub_button'] = {};
+            delete btn_list[0];
+            for(var j in btn_list) {
+                var sub_btn = btn_list[j];
+                var btn_name = $(sub_btn).text();
+                if(btn_name.length<1) {
+                    continue;
+                }
+                var sub_btn_data = {};
+                sub_btn_data['name'] = btn_name;
+                sub_btn_data['type'] = $(sub_btn).data("type");
+                sub_btn_data['key'] = $(sub_btn).data("key");
+                sub_btn_data['url'] = $(sub_btn).data("url");
+                sub_btn_data['order'] = $(sub_btn).data("order");
+
+                btn_data['sub_button'][j]=sub_btn_data;
+            }
+
+            post_data[i]=btn_data;
+
+        }
+        console.log(post_data);
+
+        $.ajax
+        ({
+            type: "POST",
+            url: '/api/{{ $mp['id'] }}/menu/save',
+            dataType: 'json',
+            contentType: "application/json; charset=utf-8",
+            async: false,
+            data: JSON.stringify({data:post_data}),
+            success: function () {
+
+            }
+        });
 
     });
 </script>
