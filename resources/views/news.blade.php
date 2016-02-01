@@ -11,7 +11,7 @@
                 <div class="inner">
                     <div class="content">
                         <img src="{{ $news[0]['thumb_url'] }}" alt="暂无图片">
-                        <div class="title_list">
+                        <div class="title-list">
                             @foreach($news as $article)
                                 <p class="title">
                                     <a href="{{ $article['url'] }}">{{ $article['title'] }}</a>
@@ -21,7 +21,7 @@
                     </div>
 
                     <div class="opr">
-                        <a href="#">编辑</a>
+                        <a href="/{{ $mp['id'] }}/news/{{ $news[0]['news_media_id'] }}/edit">编辑</a>
                         <a href="#">删除</a>
                     </div>
 

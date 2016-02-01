@@ -45,4 +45,10 @@ class DashboardController extends Controller
         $news_list = $mp->getNews();
         return view("news",compact("mp","news_list"));
     }
+
+    public function editNews($mp_id,$news_id) {
+        $mp = MediaPlatform::find($mp_id);
+        $news = $mp->getNews($news_id)[$news_id];
+        return view("news_edit",compact("mp","news"));
+    }
 }
