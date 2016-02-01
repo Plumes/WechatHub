@@ -38,4 +38,11 @@ class DashboardController extends Controller
         $button_list = $mp->getMenu();
         return view("menu",compact("mp","button_list"));
     }
+
+    public function getNews($mp_id) {
+        $mp = MediaPlatform::find($mp_id);
+        $mp->pullNewsFromRemote();
+        $news_list = $mp->getNews();
+        return view("news",compact("mp","news_list"));
+    }
 }

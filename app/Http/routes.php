@@ -30,6 +30,9 @@ Route::group(['middleware' => ['web']], function () {
     Route::get('/{mp_id}/menu', 'DashboardController@getMenu');
     Route::post('/api/{mp_id}/menu/save', 'ApiController@saveMenu');
     Route::get('/api/{mp_id}/menu/pull', 'ApiController@pullMenu');
+
+    Route::get('/{mp_id}/news', 'DashboardController@getNews');
+
     Route::get('/', 'DashboardController@index');
 
 });
