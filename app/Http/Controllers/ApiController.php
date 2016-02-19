@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Article;
 use Illuminate\Http\Request;
 
 use App\MediaPlatform;
@@ -29,5 +30,16 @@ class ApiController extends Controller
         $mp->saveMenu($post_data['data']);
         $result = $mp->pushMenuToRemote($post_data['data']);
         echo(json_encode($result));
+    }
+
+    public function getArticle($article_id) {
+        $article = Article::find($article_id);
+        echo json_encode(['code'=>0,'article'=>$article]);
+    }
+
+    public function pullNews($mp_id) {
+        $mp = MediaPlatform::find($mp_id);
+        $mp->pullNewsFromRemote();
+        echo(json_encode(['code'=>0]));
     }
 }

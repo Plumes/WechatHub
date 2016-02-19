@@ -33,6 +33,8 @@ Route::group(['middleware' => ['web']], function () {
 
     Route::get('/{mp_id}/news', 'DashboardController@getNews');
     Route::get('/{mp_id}/news/{news_id}/edit', 'DashboardController@editNews');
+    Route::get('/api/{mp_id}/news/pull', 'ApiController@pullNews');
+    Route::get('/api/article/{article_id}', 'ApiController@getArticle');
 
     Route::get('/', 'DashboardController@index');
 

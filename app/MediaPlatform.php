@@ -151,8 +151,8 @@ class MediaPlatform extends Model
                 $article['mp_id'] = $this['id'];
 
                 //处理外链图片
-                $pattern = "/mmbiz.qpic.cn/";
-                $replacement = "mmbiz.qlogo.cn";
+                $pattern = "/http:\/\/mmbiz.qpic.cn/";
+                $replacement = "https://mmbiz.qlogo.cn";
                 $article['thumb_url'] = preg_replace($pattern, $replacement, $article['thumb_url']);
                 $article['content'] = preg_replace($pattern, $replacement, $article['content']);
 

@@ -3,7 +3,8 @@
 @section('content')
 <div class="news-list-wrap">
     <div class="toolbar">
-        <button class="btn btn-success">创建素材</button>
+        <button type="button" id="create-btn" class="btn btn-success">创建素材</button>
+        <button type="button" id="pull-btn" class="btn btn-primary">从微信同步</button>
     </div>
     <ul class="news-list">
         @foreach($news_list as $news)
@@ -33,4 +34,17 @@
         @endforeach
     </ul>
 </div>
+@endsection
+
+@section('script')
+<script>
+    $("#pull-btn").click(function() {
+        var api ='/api/{{ $mp['id'] }}/news/pull';
+        $.getJSON(api,function( response ) {
+            if(response['code']=='0') {
+                location.href=location.href;
+            }
+        })
+    });
+</script>
 @endsection
