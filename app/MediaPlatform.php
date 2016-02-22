@@ -9,7 +9,7 @@ class MediaPlatform extends Model
 {
     //
     protected $fillable = [
-        'appname', 'appid', 'appsecret','access_token',
+        'appname', 'appid', 'appsecret','access_token', 'agent_id'
     ];
     protected $table = 'media_platform';
 
@@ -17,7 +17,12 @@ class MediaPlatform extends Model
         $token_update_time = $this['token_updated'];
         if((time() - $token_update_time) > 3600) {
             //如果 token 距上次更新超过一小时则再次更新
-            $api = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=".$this['appid']."&secret=".$this['appsecret'];
+            if($this['agent_id']>0) {
+                $api = config("wechat_api.qy.token.get");
+            } else {
+                $api = config("wechat_api.service.token.get");
+            }
+            $api = sprintf($api,$this['appid'],$this['appsecret']);
             $result = httpGet($api);
             $result = json_decode($result,true);
             //$this->mp['access_token'] = $result['access_token'];
@@ -51,7 +56,12 @@ class MediaPlatform extends Model
     //从微信服务器拉取菜单
     public function getMenuFromRemote() {
         $this->refreshToken();
-        $api = "https://api.weixin.qq.com/cgi-bin/menu/get?access_token=".$this['access_token'];
+        if($this['agent_id']>0) {
+            $api = config("wechat_api.qy.menu.get");
+            $api = sprintf($api,$this['access_token'],$this['agent_id']);
+        } else {
+            $api = "https://api.weixin.qq.com/cgi-bin/menu/get?access_token=".$this['access_token'];
+        }
         $result = httpGet($api);
         $result = json_decode($result,true);
         $this->saveMenu($result['menu']['button']);
@@ -63,11 +73,22 @@ class MediaPlatform extends Model
     public function pushMenuToRemote($button_list) {
         $this->refreshToken();
         //需要先执行删除操作，把现有菜单全部删除
-        $api = config("wechat_api.menu.delete");
-        $api .= $this['access_token'];
+        if($this['agent_id']>0) {
+            $api = config("wechat_api.qy.menu.delete");
+            $api = sprintf($api,$this['access_token'],$this['agent_id']);
+        } else {
+            $api = config("wechat_api.service.menu.delete");
+            $api = sprintf($api,$this['access_token']);
+        }
         $result = httpGet($api);
-        $api = config("wechat_api.menu.create");
-        $api .= $this['access_token'];
+
+        if($this['agent_id']>0) {
+            $api = config("wechat_api.qy.menu.create");
+            $api = sprintf($api,$this['access_token'],$this['agent_id']);
+        } else {
+            $api = config("wechat_api.service.menu.create");
+            $api = sprintf($api,$this['access_token']);
+        }
 
         foreach($button_list as $k=>$button) {
             $sub_btn_list = [];

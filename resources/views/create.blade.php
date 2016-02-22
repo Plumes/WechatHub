@@ -24,6 +24,10 @@
                     <label for="appsecret">Secret</label>
                     <input type="text" class="form-control" id="appsecret" name="appsecret" placeholder="">
                 </div>
+                <div class="form-group">
+                    <label for="agent_id">Secret</label>
+                    <input type="text" class="form-control" id="agent_id" name="agent_id" placeholder="Agent id">
+                </div>
                 <button type="submit" class="btn btn-default">添加</button>
             </form>
         </div>

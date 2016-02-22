@@ -30,6 +30,7 @@ class DashboardController extends Controller
         $mp['appname'] = $request->input("appname");
         $mp['appid'] = $request->input("appid");
         $mp['appsecret'] = $request->input("appsecret");
+        $mp['agent_id'] = intval($request->input("agent_id"));
         $mp_id = MediaPlatform::createMP($mp);
     }
 
